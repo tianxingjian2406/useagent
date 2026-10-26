@@ -14,7 +14,7 @@ import type { RefObject } from "react";
 
 test("activating Scroll to end jumps and keeps focus in the reply box", async () => {
   const composer = document.createElement("div");
-  composer.setAttribute("data-session-ui", "composer");
+  composer.setAttribute("data-session-ui", "reply-composer");
   const textarea = document.createElement("textarea");
   composer.appendChild(textarea);
   document.body.appendChild(composer);

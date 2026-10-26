@@ -50,7 +50,9 @@ function Row({
         if (buttons.length > 0) {
           buttons[Math.min(index, buttons.length - 1)]?.focus();
         } else {
-          document.querySelector<HTMLElement>('[data-session-ui="composer"] textarea')?.focus();
+          document
+            .querySelector<HTMLElement>('[data-session-ui="reply-composer"] textarea')
+            ?.focus();
         }
       });
     } catch {

@@ -16,7 +16,7 @@ const flushFrame = () => new Promise<void>((resolve) => setTimeout(resolve, 60))
 
 function mountComposer(): HTMLTextAreaElement {
   const composer = document.createElement("div");
-  composer.setAttribute("data-session-ui", "composer");
+  composer.setAttribute("data-session-ui", "reply-composer");
   const textarea = document.createElement("textarea");
   composer.appendChild(textarea);
   document.body.appendChild(composer);

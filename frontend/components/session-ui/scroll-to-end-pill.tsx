@@ -49,7 +49,9 @@ export function ScrollToEndPill({ scrollRef }: { scrollRef: RefObject<HTMLElemen
     jumpToEnd(el);
     // The pill unmounts once the reader is at the end, taking its focus with
     // it; hand focus to the reply box so keyboard users keep their place.
-    document.querySelector<HTMLElement>('[data-session-ui="composer"] textarea')?.focus();
+    document
+      .querySelector<HTMLElement>('[data-session-ui="reply-composer"] textarea')
+      ?.focus();
   };
 
   return (
