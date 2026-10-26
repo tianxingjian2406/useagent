@@ -457,6 +457,7 @@ export function Composer({
     // a native dark pill in dark - never a white island clashing with the dark page.
     <div
       ref={rootRef}
+      data-session-ui="composer"
       className={cn("relative w-full", className)}
       {...(enableUploads ? attachmentIntake(runUploads.addFiles, !busy) : {})} // drop or paste files here
     >

@@ -22,10 +22,13 @@ export interface QueuedMessage {
 
 function Row({
   message,
+  index,
   onSendNow,
   onRemove,
 }: {
   message: QueuedMessage;
+  /** Place of this row in the rendered list; the anchor for focus after removal. */
+  index: number;
   onSendNow?: () => void;
   onRemove?: (id: string) => Promise<void> | void;
 }) {
@@ -37,6 +40,19 @@ function Row({
     setFailed(false);
     try {
       await onRemove(message.id);
+      // The row (and its focused Remove button) has left the list; keep
+      // keyboard users in place on the next row's Remove, or the reply box
+      // when no queued message is left. Waits one frame for the list commit.
+      requestAnimationFrame(() => {
+        const buttons = document.querySelectorAll<HTMLButtonElement>(
+          '[data-session-ui="queued-messages"] [aria-label^="Remove queued message"]',
+        );
+        if (buttons.length > 0) {
+          buttons[Math.min(index, buttons.length - 1)]?.focus();
+        } else {
+          document.querySelector<HTMLElement>('[data-session-ui="composer"] textarea')?.focus();
+        }
+      });
     } catch {
       setFailed(true);
     } finally {
@@ -100,10 +116,11 @@ export function QueuedMessages({
       aria-label="Queued messages"
       className="scrollbar-slim mb-1.5 flex max-h-40 flex-col gap-1 overflow-y-auto"
     >
-      {messages.map((message) => (
+      {messages.map((message, index) => (
         <Row
           key={message.id}
           message={message}
+          index={index}
           onSendNow={message.id === sendNowFor ? onSendNow : undefined}
           onRemove={onRemove}
         />
