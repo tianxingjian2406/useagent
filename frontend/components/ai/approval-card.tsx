@@ -34,7 +34,8 @@ export function ApprovalCard({
   allowCustom = false,
   className,
 }: ApprovalCardProps) {
-  const [selected, setSelected] = useState<number | null>(null);
+  // A card with one option starts with it selected, so Approve works at once.
+  const [selected, setSelected] = useState<number | null>(options.length === 1 ? 0 : null);
   const [custom, setCustom] = useState("");
 
   const customActive = allowCustom && custom.trim().length > 0;
