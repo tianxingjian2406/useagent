@@ -9,7 +9,7 @@
 // the queued run itself, which the API fails before it ever starts.
 
 import { RiCloseLine } from "@remixicon/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export interface QueuedMessage {
   readonly id: string;
@@ -34,27 +34,31 @@ function Row({
 }) {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  const removeButtonRef = useRef<HTMLButtonElement>(null);
   const remove = async () => {
     if (!onRemove || busy) return;
     setBusy(true);
     setFailed(false);
     try {
       await onRemove(message.id);
-      // The row (and its focused Remove button) has left the list; keep
-      // keyboard users in place on the next row's Remove, or the reply box
-      // when no queued message is left. Waits one frame for the list commit.
-      requestAnimationFrame(() => {
-        const buttons = document.querySelectorAll<HTMLButtonElement>(
+      // The app only sends the cancel here; the row leaves the list later,
+      // when the thread updates. Focus a control that survives either way -
+      // the next row's Remove, the previous row's when this was the last, or
+      // the reply box when no other row remains - and never this row's own
+      // button, which is about to unmount and would drop focus to the page.
+      const own = removeButtonRef.current;
+      const buttons = [
+        ...document.querySelectorAll<HTMLButtonElement>(
           '[data-session-ui="queued-messages"] [aria-label^="Remove queued message"]',
-        );
-        if (buttons.length > 0) {
-          buttons[Math.min(index, buttons.length - 1)]?.focus();
-        } else {
-          document
-            .querySelector<HTMLElement>('[data-session-ui="reply-composer"] textarea')
-            ?.focus();
-        }
-      });
+        ),
+      ].filter((button) => button !== own);
+      if (buttons.length > 0) {
+        buttons[Math.min(index, buttons.length - 1)]?.focus();
+      } else {
+        document
+          .querySelector<HTMLElement>('[data-session-ui="reply-composer"] textarea')
+          ?.focus();
+      }
     } catch {
       setFailed(true);
     } finally {
@@ -83,6 +87,7 @@ function Row({
       )}
       {onRemove && !message.pending && (
         <button
+          ref={removeButtonRef}
           type="button"
           aria-label={`Remove queued message ${message.position}`}
           title="Remove from the queue"
